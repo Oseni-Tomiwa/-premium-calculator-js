@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalcPro™</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Calculator ── -->
+<div class="calculator">
+  <div class="brand">CalcPro™</div>
+  <div class="display">
+    <div class="expression" id="expression"></div>
+    <div class="result" id="result">0</div>
+  </div>
+  <div class="buttons">
+    <button class="btn-func" onclick="clearAll()">AC</button>
+    <button class="btn-func" onclick="toggleSign()">+/−</button>
+    <button class="btn-func" onclick="percent()">%</button>
+    <button class="btn-op"   onclick="setOp('/')">÷</button>
+
+    <button class="btn-num" onclick="input('7')">7</button>
+    <button class="btn-num" onclick="input('8')">8</button>
+    <button class="btn-num" onclick="input('9')">9</button>
+    <button class="btn-op"  onclick="setOp('*')">×</button>
+
+    <button class="btn-num" onclick="input('4')">4</button>
+    <button class="btn-num" onclick="input('5')">5</button>
+    <button class="btn-num" onclick="input('6')">6</button>
+    <button class="btn-op"  onclick="setOp('-')">−</button>
+
+    <button class="btn-num" onclick="input('1')">1</button>
+    <button class="btn-num" onclick="input('2')">2</button>
+    <button class="btn-num" onclick="input('3')">3</button>
+    <button class="btn-op"  onclick="setOp('+')">+</button>
+
+    <button class="btn-num btn-zero" onclick="input('0')">0</button>
+    <button class="btn-num" onclick="inputDot()">.</button>
+    <button class="btn-eq"  onclick="calculate()">=</button>
+  </div>
+  <div class="kbd-hint">⌨️ keyboard supported · Backspace to delete · Esc to close</div>
+</div>
+
+<!-- ── Modal ── -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+
+    <!-- Step 1: Pricing -->
+    <div id="step-pricing">
+      <div class="pricing-header">
+        <span class="lock">🔒</span>
+        <h2>Unlock your result</h2>
+      </div>
+      <p class="pricing-sub">
+        You've used your <span class="count">0</span> free calculations this month.<br/>
+        Upgrade to see answers.
+      </p>
+
+      <div class="plans">
+        <div class="plan-card" id="plan-basic" onclick="selectPlan('basic')">
+          <div class="plan-card-name">Basic</div>
+          <div class="plan-card-price">$9.99</div>
+          <div class="plan-card-mo">/mo</div>
+          <div class="plan-card-desc">10 calcs</div>
+        </div>
+        <div class="plan-card selected" id="plan-pro" onclick="selectPlan('pro')">
+          <div class="popular-badge">⭐ Popular</div>
+          <div class="plan-card-name">Pro</div>
+          <div class="plan-card-price">$99.90</div>
+          <div class="plan-card-mo">/mo</div>
+          <div class="plan-card-desc">Unlimited</div>
+        </div>
+        <div class="plan-card" id="plan-teams" onclick="selectPlan('teams')">
+          <div class="plan-card-name">Teams</div>
+          <div class="plan-card-price">$299</div>
+          <div class="plan-card-mo">/mo</div>
+          <div class="plan-card-desc">5 users</div>
+        </div>
+      </div>
+
+      <button class="btn-upgrade" id="upgrade-btn" onclick="showPayment()">
+        Upgrade to see <span id="upgrade-expr">your result</span>
+      </button>
+      <div class="free-tier-note">Free plan: <span>0 calculations/month</span></div>
+      <button class="btn-skip" onclick="closeModal()">No thanks, I'll stay bad at math</button>
+    </div>
+
+    <!-- Step 2: Payment -->
+    <div id="step-payment">
+      <div class="payment-header">
+        <button class="back-btn" onclick="showPricing()">←</button>
+        <div>
+          <div class="payment-title">Payment Details</div>
+          <div class="payment-subtitle">Secure checkout · CalcPay™</div>
+        </div>
+      </div>
+
+      <div class="amount-badge">
+        <span class="amount-label">Total due today</span>
+        <span class="amount-value" id="amount-display">$99.90</span>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Name on Card</div>
+        <input class="field-input" id="card-name" type="text" placeholder="John Doe" />
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Card Number</div>
+        <div class="card-number-wrap">
+          <input class="field-input" id="card-number" type="text"
+            placeholder="1234 5678 9012 3456" maxlength="19"
+            oninput="formatCard(this)" style="padding-right: 84px;" />
+          <div class="card-icons">
+            <div class="card-icon visa">VISA</div>
+            <div class="card-icon mc">MC</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field-group">
+          <div class="field-label">Expiry</div>
+          <input class="field-input" id="card-expiry" type="text"
+            placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">CVC</div>
+          <input class="field-input" id="card-cvc" type="text"
+            placeholder="•••" maxlength="3"
+            oninput="this.value=this.value.replace(/\D/g,'')" />
+        </div>
+      </div>
+
+      <button class="btn-pay" id="pay-btn" onclick="processPayment()">
+        <span id="pay-label">Pay $99.90</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+
+      <div class="secure-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.25 3.75 10.15 9 11.35C17.25 21.15 21 16.25 21 11V5l-9-4z"/></svg>
+        256-bit SSL encrypted · Cancel anytime
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="step-success">
+      <div class="success-circle">✓</div>
+      <h2>You're all set!</h2>
+      <p>Payment confirmed.<br/>Welcome to CalcPro™ — enjoy your <strong>calculations</strong>.</p>
+      <button class="btn-done" onclick="finishSubscribe()">Start Calculating 🎉</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">🎉 Welcome to CalcPro™ Pro!</div>
+
+<script src="script.js"></script>
+</body>
+</html>
